@@ -488,6 +488,18 @@ When given an open-ended generic SQL execution tool (`BigQueryToolset` with raw 
 - **What to Learn**:
   - Technical mastery includes the ability to explain complex distributed systems and AI architectures using clear, intuitive mental models.
 
+### Step 13: Format Lab Instructions (`readme.txt`)
+- **User Prompt**:
+  > Can you format this file properly, so that actual instructions can be read properly, no change to text. only formatting. `/home/student_01_6fa9fc9576d7/adk_eval_challenge_lab/readme.txt`
+- **Files Modified**:
+  - `readme.txt`: Cleaned up copy-paste artifacts (such as empty button lines, dangling brackets), structured sections using Markdown headers (`#`, `##`, `###`), added syntax-highlighted code fences (```bash, ```json), formatted data tables into clean Markdown tables, and emphasized key notes with blockquotes. No text or instruction semantics were modified.
+- **Why We Did It**:
+  - The raw text was an unformatted copy-paste dump from the web interface, making terminal commands hard to distinguish from narrative instructions and tables hard to read.
+- **What's the Benefit**:
+  - **Readability & Execution Accuracy**: Makes commands instantly copyable and identifiable, reducing operator error during lab execution.
+- **What to Learn**:
+  - Proper Markdown documentation structure is essential in DevOps and MLOps runbooks to ensure repeatability and clarity.
+
 ---
 
 ## Technical Concept Guide: What to Learn in This Lab
