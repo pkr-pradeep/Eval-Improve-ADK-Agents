@@ -431,6 +431,51 @@ When given an open-ended generic SQL execution tool (`BigQueryToolset` with raw 
 - **What to Learn**:
   - **Prompt Grounding with Constrained Tooling**: When replacing broad toolsets with specialized tools, prompt instructions must be updated synchronously to reflect the new tool contracts, data models, and error-handling expectations.
 
+### Step 11: Re-Run Evaluation with Improved Agent
+- **User Prompt**:
+  > Run the evaluations again using the ADK CLI, again using tee to save the results to a file:
+  > ```bash
+  > adk eval bigquery_agent ledger \
+  > --config_file_path bigquery_agent/evaluations/eval_config.json \
+  > --print_detailed_results \
+  > --log_level=CRITICAL \
+  > | tee improved_eval_results.txt
+  > ```
+- **Command Executed**:
+  ```bash
+  adk eval bigquery_agent ledger \
+    --config_file_path bigquery_agent/evaluations/eval_config.json \
+    --print_detailed_results \
+    --log_level=CRITICAL \
+    | tee improved_eval_results.txt
+  ```
+- **Files Created**:
+  - `improved_eval_results.txt`: Captured full evaluation run output.
+- **Evaluation Results Comparison**:
+
+| Metric | Baseline (Initial Run) | Improved Agent (After Fixes) |
+| :--- | :---: | :---: |
+| **Total Passed** | 1 / 3 | **3 / 3 (100%)** |
+| **Total Failed** | 2 / 3 | **0 / 3 (0%)** |
+
+- **Scenario-by-Scenario Breakdown**:
+
+| Scenario ID & Customer | Description | Baseline Result | Improved Result | Rationale / Fix Verified |
+| :--- | :--- | :---: | :---: | :--- |
+| **`271c2959`**<br>(Bob Jones) | Deposit payment move | **PASSED** (1.0) | **PASSED** (1.0) | Verified atomic move from `pool_estimates` to `accepted_with_deposit` via `perform_consistent_transaction`. |
+| **`b04fc15b`**<br>(Ron Weasley) | Cleanup request: delete record without moving | **FAILED** (0.5)<br>*(ledger_validity: 0.0)* | **PASSED** (1.0)<br>*(ledger_validity: 1.0, valid_transitions: 1.0)* | Agent confirmed no direct deletion tool exists, verified with `check_transaction` that no valid transition exists from `paid_and_closed`, and refused unrecorded deletion. |
+| **`3829ffdb`**<br>(Clark Kent) | Skip state to close account early | **FAILED** (0.5)<br>*(valid_transitions: 0.0)* | **PASSED** (1.0)<br>*(ledger_validity: 1.0, valid_transitions: 1.0)* | Agent used `check_transaction` to detect that jumping `scheduled_installations` -> `paid_and_closed` is invalid, and executed intermediate transitions through `completed_pools`. |
+
+- **Why We Did It**:
+  - To empirically validate that the architectural changes (composite transactions, finite state machine checks, tool restrictions, and prompt grounding) successfully resolved all identified failure modes.
+- **What's the Benefit**:
+  - **Empirical Proof of Correctness**: Moves agent development from subjective manual testing to objective, reproducible, and verifiable engineering.
+  - **Zero Regressions**: Confirmed that fixing the two failing scenarios did not break the existing passing scenario (`271c2959`).
+- **What to Learn**:
+  - **The Iterative Eval Loop**: The core loop of Agent Engineering:
+    $$\text{Define Rubrics} \longrightarrow \text{Baseline Eval} \longrightarrow \text{Identify Flaws} \longrightarrow \text{Constrain Tooling / Instructions} \longrightarrow \text{Re-Evaluate}$$
+    proves efficacy with measurable deltas (from 33% to 100% pass rate).
+
 ---
 
 ## Technical Concept Guide: What to Learn in This Lab
