@@ -358,6 +358,79 @@ When given an open-ended generic SQL execution tool (`BigQueryToolset` with raw 
 - **What to Learn**:
   - **Headless Cloud Shell Authentication**: How to use OAuth device code flows (`gh auth login --web`) in remote VM environments without browser popups.
 
+### Step 10: Update Agent Instructions with Table Schemas and Tool Guidance
+- **User Prompt**:
+  > Replace the last line of the agent's instruction (which currently reads "Query all available tables") with the following to provide the agent more information about the available tables and when to use the tools you have provided to it. Make sure you remove all mentions of the bigquery_toolset.
+  > The tables you have available are:
+  >   - pool_estimates: Contains all pool estimates
+  >   - accepted_with_deposit: Contains all pool estimates that have been accepted and have a deposit
+  >   - denied_estimates: Estimates that have been denied by the customer and will not proceed.
+  >   - scheduled_installations: Contains all pool installations that have been scheduled
+  >   - completed_pools: Contains all pool installations that have been completed
+  >   - paid_and_closed: Contains all pool installations that have been paid and closed
+  > 
+  > Use read_table_all to read the data from the tables.
+  > Use check_transaction to check if a transaction is valid before performing any transactions. If not valid, tell the user so.
+  > Use perform_consistent_transaction when you need to read a table, insert a row into another table and delete the original row.
+- **Files Modified**:
+  - `bigquery_agent/agent.py`: Updated `instruction` string in `root_agent`.
+- **Code Snippet (Implemented)**:
+  ```python
+  instruction=f"""
+      You are a data science agent with access to several BigQuery tools.
+      Make use of those tools to answer the user's questions.
+
+      When querying BigQuery, always use the project
+      {os.getenv('GOOGLE_CLOUD_PROJECT')} and the dataset named `pool_data`.
+      Do not create new tables.
+      Before deleting a record to move it, confirm it exists and can be moved.
+      Before adding a record, confirm it is not already present.
+      The tables you have available are:
+        - pool_estimates: Contains all pool estimates
+        - accepted_with_deposit: Contains all pool estimates that have been accepted and have a deposit
+        - denied_estimates: Estimates that have been denied by the customer and will not proceed.
+        - scheduled_installations: Contains all pool installations that have been scheduled
+        - completed_pools: Contains all pool installations that have been completed
+        - paid_and_closed: Contains all pool installations that have been paid and closed
+
+      Use read_table_all to read the data from the tables.
+      Use check_transaction to check if a transaction is valid before performing any transactions. If not valid, tell the user so.
+      Use perform_consistent_transaction when you need to read a table, insert a row into another table and delete the original row.
+  """,
+  ```
+- **Code Difference (Diff)**:
+  ```diff
+  --- a/bigquery_agent/agent.py
+  +++ b/bigquery_agent/agent.py
+  @@ -245,7 +245,17 @@ root_agent = Agent(
+           Do not create new tables.
+           Before deleting a record to move it, confirm it exists and can be moved.
+           Before adding a record, confirm it is not already present.
+  -        Query all available tables in the dataset, and then decide which table to use.
+  +        The tables you have available are:
+  +          - pool_estimates: Contains all pool estimates
+  +          - accepted_with_deposit: Contains all pool estimates that have been accepted and have a deposit
+  +          - denied_estimates: Estimates that have been denied by the customer and will not proceed.
+  +          - scheduled_installations: Contains all pool installations that have been scheduled
+  +          - completed_pools: Contains all pool installations that have been completed
+  +          - paid_and_closed: Contains all pool installations that have been paid and closed
+  +
+  +        Use read_table_all to read the data from the tables.
+  +        Use check_transaction to check if a transaction is valid before performing any transactions. If not valid, tell the user so.
+  +        Use perform_consistent_transaction when you need to read a table, insert a row into another table and delete the original row.
+       """,
+  ```
+- **Why We Did It**:
+  - Restricting tools in code prevents unauthorized actions, but the LLM still needs clear semantic understanding of:
+    1. Which tables represent which lifecycle states.
+    2. *When* and *how* to invoke each tool (e.g. check `check_transaction` first; use `perform_consistent_transaction` for state transitions; tell the user if invalid).
+  - Removing vague instructions ("Query all available tables") and replacing them with deterministic procedural instructions directly aligns the model's reasoning loop with the toolset capabilities.
+- **What's the Benefit**:
+  - **Tool-Prompt Synergy**: Ensures the agent understands the exact contract of the custom tools.
+  - **Explainability**: Instructing the agent to "tell the user so" when a transaction is invalid prevents silent failures or repeated attempts to execute disallowed moves.
+- **What to Learn**:
+  - **Prompt Grounding with Constrained Tooling**: When replacing broad toolsets with specialized tools, prompt instructions must be updated synchronously to reflect the new tool contracts, data models, and error-handling expectations.
+
 ---
 
 ## Technical Concept Guide: What to Learn in This Lab

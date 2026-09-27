@@ -245,7 +245,17 @@ root_agent = Agent(
         Do not create new tables.
         Before deleting a record to move it, confirm it exists and can be moved.
         Before adding a record, confirm it is not already present.
-        Query all available tables in the dataset, and then decide which table to use.
+        The tables you have available are:
+          - pool_estimates: Contains all pool estimates
+          - accepted_with_deposit: Contains all pool estimates that have been accepted and have a deposit
+          - denied_estimates: Estimates that have been denied by the customer and will not proceed.
+          - scheduled_installations: Contains all pool installations that have been scheduled
+          - completed_pools: Contains all pool installations that have been completed
+          - paid_and_closed: Contains all pool installations that have been paid and closed
+
+        Use read_table_all to read the data from the tables.
+        Use check_transaction to check if a transaction is valid before performing any transactions. If not valid, tell the user so.
+        Use perform_consistent_transaction when you need to read a table, insert a row into another table and delete the original row.
     """,
     before_model_callback=log_query_to_model,
     after_model_callback=log_model_response,
