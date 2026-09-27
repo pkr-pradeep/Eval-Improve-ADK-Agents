@@ -476,6 +476,18 @@ When given an open-ended generic SQL execution tool (`BigQueryToolset` with raw 
     $$\text{Define Rubrics} \longrightarrow \text{Baseline Eval} \longrightarrow \text{Identify Flaws} \longrightarrow \text{Constrain Tooling / Instructions} \longrightarrow \text{Re-Evaluate}$$
     proves efficacy with measurable deltas (from 33% to 100% pass rate).
 
+### Step 12: Create Beginner-Friendly Guide (`understand_files.md`)
+- **User Prompt**:
+  > Can you create a file called `understand_files.md`, where we can simplify main files and main commands so that anyone can understand it easily, even a college going kid.
+- **Files Created**:
+  - `understand_files.md`: A comprehensive, conversational, real-world guide explaining the Cymbal Pools scenario, file roles (using driving exam analogies), command breakdowns, and architectural takeaways.
+- **Why We Did It**:
+  - To make the complex concepts of Agent Evaluation, Multi-Turn Simulation, Finite State Machines, and API Tool Gating accessible and understandable to students, junior developers, and non-technical stakeholders.
+- **What's the Benefit**:
+  - **Knowledge Sharing & Onboarding**: Serves as a reference guide for anyone wanting to learn how to test and improve AI agents using Google's Agent Development Kit (ADK).
+- **What to Learn**:
+  - Technical mastery includes the ability to explain complex distributed systems and AI architectures using clear, intuitive mental models.
+
 ---
 
 ## Technical Concept Guide: What to Learn in This Lab
