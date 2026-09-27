@@ -309,6 +309,55 @@ When given an open-ended generic SQL execution tool (`BigQueryToolset` with raw 
 - **What to Learn**:
   - **Defensive Tool Gating (API Boundary Enforcement)**: In agentic design, tools define the agent's capability boundary. The most effective way to prevent unauthorized actions is to physically remove the tools that enable them.
 
+### Step 9: Authenticate GitHub & Push Project to Personal Repository
+- **User Prompt**:
+  > for 8 letter one time auth code
+  > gh auth login --web -p https 
+  > 
+  > add the project to my personal GitHub repo
+  > below are command to add
+  > ==========================
+  > echo "# Eval-Improve-ADK-Agents" >> README.md
+  > git init
+  > git add README.md
+  > git commit -m "first commit"
+  > git branch -M main
+  > git remote add origin https://github.com/pkr-pradeep/Eval-Improve-ADK-Agents.git
+  > git push -u origin main
+- **Commands Executed**:
+  ```bash
+  # 1. Device login via GitHub CLI
+  gh auth login --web -p https
+  gh auth setup-git
+  git config --global user.name "Pradeep Rout"
+  git config --global user.email "pkr-pradeep@users.noreply.github.com"
+
+  # 2. Initialize and push initial commit
+  echo "# Eval-Improve-ADK-Agents" >> README.md
+  git init
+  git add README.md
+  git commit -m "first commit"
+  git branch -M main
+  git remote add origin https://github.com/pkr-pradeep/Eval-Improve-ADK-Agents.git
+  git push -u origin main
+
+  # 3. Add all project files, evaluations, and progress docs
+  git add .
+  git commit -m "Add Cymbal Pools BigQuery Agent project files and progress tracking"
+  git push origin main
+  ```
+- **Files Created / Modified**:
+  - `README.md`: Created project header.
+  - `.gitignore`: Updated with terraform state and local lock files.
+  - Remote repository: Pushed all project files to `https://github.com/pkr-pradeep/Eval-Improve-ADK-Agents.git`.
+- **Why We Did It**:
+  - To persist all work, evaluation artifacts, logs, and development progress in personal version control for external tracking and preservation across temporary lab sessions.
+- **What's the Benefit**:
+  - **Work Preservation**: Qwiklabs environments are ephemeral. Pushing to GitHub ensures no work or documentation is lost when the lab ends.
+  - **Portfolio & Reproducibility**: Demonstrates automated ADK evaluation and tool engineering workflows in a public or personal repository.
+- **What to Learn**:
+  - **Headless Cloud Shell Authentication**: How to use OAuth device code flows (`gh auth login --web`) in remote VM environments without browser popups.
+
 ---
 
 ## Technical Concept Guide: What to Learn in This Lab
